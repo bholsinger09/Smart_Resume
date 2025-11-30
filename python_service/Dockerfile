@@ -21,4 +21,5 @@ RUN pip install https://github.com/explosion/spacy-models/releases/download/en_c
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use PORT env variable for Render, default to 8000
+CMD uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000}

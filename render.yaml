@@ -1,0 +1,61 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: smartresume-postgres
+    env: docker
+    plan: free
+    repo: https://github.com/bholsinger09/Smart_Resume
+    dockerfilePath: ./postgres/Dockerfile
+    dockerContext: ./postgres
+    envVars:
+      - key: POSTGRES_DB
+        value: smartresume_production
+      - key: POSTGRES_USER
+        value: postgres
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+    disk:
+      name: postgres-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1
+
+  # Python Service (FastAPI)
+  - type: web
+    name: smartresume-python
+    env: docker
+    plan: free
+    repo: https://github.com/bholsinger09/Smart_Resume
+    dockerfilePath: ./python_service/Dockerfile
+    dockerContext: ./python_service
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8000
+
+  # Rails App
+  - type: web
+    name: smartresume-rails
+    env: docker
+    plan: free
+    repo: https://github.com/bholsinger09/Smart_Resume
+    dockerfilePath: ./rails_app/Dockerfile
+    dockerContext: ./rails_app
+    healthCheckPath: /
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_SERVE_STATIC_FILES
+        value: true
+      - key: RAILS_LOG_TO_STDOUT
+        value: true
+      - key: SECRET_KEY_BASE
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smartresume-postgres
+          property: connectionString
+      - key: PYTHON_SERVICE_URL
+        fromService:
+          name: smartresume-python
+          type: web
+          property: host
