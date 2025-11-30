@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: smart_resume
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: smart_resume_development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smart_resume"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  python_service:
+    build:
+      context: ./python_service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+    volumes:
+      - ./python_service:/app
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  rails_app:
+    build:
+      context: ./rails_app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://smart_resume:password@postgres:5432/smart_resume_development
+      - PYTHON_SERVICE_URL=http://python_service:8000
+      - RAILS_ENV=development
+    volumes:
+      - ./rails_app:/app
+      - rails_bundle:/usr/local/bundle
+    depends_on:
+      postgres:
+        condition: service_healthy
+      python_service:
+        condition: service_healthy
+    command: >
+      bash -c "
+        bundle install &&
+        rails db:create db:migrate db:seed &&
+        rails server -b 0.0.0.0
+      "
+
+volumes:
+  postgres_data:
+  rails_bundle:

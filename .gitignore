@@ -1,0 +1,41 @@
+# Rails
+/rails_app/log/*
+/rails_app/tmp/*
+!/rails_app/log/.keep
+!/rails_app/tmp/.keep
+/rails_app/storage/*
+!/rails_app/storage/.keep
+/rails_app/public/uploads
+/rails_app/public/packs
+/rails_app/public/packs-test
+/rails_app/node_modules
+/rails_app/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+
+# Python
+/python_service/__pycache__/
+/python_service/*.py[cod]
+/python_service/*$py.class
+/python_service/.pytest_cache/
+/python_service/venv/
+/python_service/.env
+/python_service/*.egg-info/
+
+# Environment
+.env
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml

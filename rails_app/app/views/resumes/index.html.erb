@@ -1,0 +1,77 @@
+<div class="bg-white rounded-lg shadow-md p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">My Resumes</h1>
+  </div>
+  
+  <!-- Upload Resume Form -->
+  <div class="bg-blue-50 rounded-lg p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4">Upload New Resume</h2>
+    <%= form_with url: resumes_path, multipart: true, class: "space-y-4" do |f| %>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Choose Resume (PDF, DOCX, or TXT)
+        </label>
+        <%= file_field_tag 'resume[file]', accept: '.pdf,.docx,.txt', class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100", required: true %>
+      </div>
+      
+      <%= f.submit "Upload & Analyze", class: "bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 cursor-pointer" %>
+    <% end %>
+  </div>
+  
+  <!-- Resume List -->
+  <% if @resumes.any? %>
+    <div class="space-y-4">
+      <% @resumes.each do |resume| %>
+        <div class="border rounded-lg p-4 hover:shadow-md transition">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-blue-600 mb-2">
+                <%= link_to resume.filename, resume_path(resume) %>
+              </h3>
+              
+              <% if resume.summary.present? %>
+                <p class="text-gray-700 mb-3">
+                  <%= truncate(resume.summary, length: 150) %>
+                </p>
+              <% end %>
+              
+              <% if resume.extracted_skills.any? %>
+                <div class="flex flex-wrap gap-2 mb-3">
+                  <% resume.extracted_skills.first(10).each do |skill| %>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                      <%= skill %>
+                    </span>
+                  <% end %>
+                  <% if resume.extracted_skills.count > 10 %>
+                    <span class="text-gray-500 text-xs">+<%= resume.extracted_skills.count - 10 %> more</span>
+                  <% end %>
+                </div>
+              <% else %>
+                <p class="text-gray-500 text-sm mb-3">
+                  Processing skills... <span class="animate-pulse">⏳</span>
+                </p>
+              <% end %>
+              
+              <p class="text-xs text-gray-500">
+                Uploaded <%= time_ago_in_words(resume.created_at) %> ago
+              </p>
+            </div>
+            
+            <div class="ml-4 text-right">
+              <p class="text-sm text-gray-600 mb-2">
+                <%= resume.matches.count %> matches
+              </p>
+              <%= link_to "View Details", resume_path(resume), class: "text-blue-600 hover:underline text-sm block mb-1" %>
+              <%= link_to "Delete", resume_path(resume), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 hover:underline text-sm block" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-gray-500 text-lg">No resumes uploaded yet.</p>
+      <p class="text-gray-400">Upload your first resume above to get started!</p>
+    </div>
+  <% end %>
+</div>

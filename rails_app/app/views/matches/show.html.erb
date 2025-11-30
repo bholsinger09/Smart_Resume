@@ -1,0 +1,89 @@
+<div class="bg-white rounded-lg shadow-md p-6">
+  <div class="mb-6">
+    <%= link_to "← Back", :back, class: "text-blue-600 hover:underline" %>
+  </div>
+  
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-4">Match Results</h1>
+    
+    <div class="grid grid-cols-2 gap-8 mb-8">
+      <!-- Resume Info -->
+      <div>
+        <h3 class="text-sm font-medium text-gray-600 mb-1">Resume</h3>
+        <p class="text-lg font-semibold">
+          <%= link_to @match.resume.filename, resume_path(@match.resume), class: "text-blue-600 hover:underline" %>
+        </p>
+      </div>
+      
+      <!-- Job Info -->
+      <div>
+        <h3 class="text-sm font-medium text-gray-600 mb-1">Job</h3>
+        <p class="text-lg font-semibold">
+          <%= link_to @match.job.title, job_path(@match.job), class: "text-blue-600 hover:underline" %>
+        </p>
+        <p class="text-gray-600"><%= @match.job.company %></p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Match Score -->
+  <div class="mb-8 text-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-8">
+    <h2 class="text-xl font-semibold mb-2">Match Score</h2>
+    <p class="text-6xl font-bold text-<%= @match.score >= 70 ? 'green' : @match.score >= 50 ? 'yellow' : 'red' %>-600 mb-2">
+      <%= @match.match_percentage %>
+    </p>
+    <p class="text-2xl text-gray-700"><%= @match.match_level %> Match</p>
+  </div>
+  
+  <!-- Matched Skills -->
+  <div class="mb-8">
+    <h2 class="text-2xl font-semibold mb-4 text-green-600">
+      ✓ Matched Skills (<%= @match.matched_skills.size %>)
+    </h2>
+    
+    <% if @match.matched_skills.any? %>
+      <div class="flex flex-wrap gap-2">
+        <% @match.matched_skills.each do |skill| %>
+          <span class="bg-green-100 text-green-800 px-3 py-2 rounded-lg font-medium">
+            <%= skill %>
+          </span>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-500">No matching skills found.</p>
+    <% end %>
+  </div>
+  
+  <!-- Missing Skills -->
+  <% if @match.missing_skills.any? %>
+    <div class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4 text-yellow-600">
+        ⚠ Skills to Develop (<%= @match.missing_skills.size %>)
+      </h2>
+      
+      <div class="flex flex-wrap gap-2">
+        <% @match.missing_skills.each do |skill| %>
+          <span class="bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg">
+            <%= skill %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- Recommendations -->
+  <% if @match.recommendations.present? %>
+    <div class="mb-8 bg-blue-50 rounded-lg p-6">
+      <h2 class="text-2xl font-semibold mb-4">💡 Recommendations</h2>
+      <p class="text-gray-700 leading-relaxed">
+        <%= @match.recommendations %>
+      </p>
+    </div>
+  <% end %>
+  
+  <!-- Actions -->
+  <div class="flex space-x-4">
+    <%= link_to "View Job Details", job_path(@match.job), class: "bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700" %>
+    <%= link_to "View Resume", resume_path(@match.resume), class: "bg-gray-200 text-gray-800 px-6 py-2 rounded hover:bg-gray-300" %>
+  </div>
+</div>
