@@ -1,24 +1,24 @@
-<div class="bg-white rounded-lg shadow-md p-6">
+<div class="bg-gray-800 rounded-lg shadow-2xl p-6 border border-gray-700">
   <div class="mb-6">
-    <%= link_to "← Back to Resumes", resumes_path, class: "text-blue-600 hover:underline" %>
+    <%= link_to "← Back to Resumes", resumes_path, class: "text-blue-400 hover:text-blue-300 transition" %>
   </div>
   
   <div class="mb-8">
-    <h1 class="text-3xl font-bold mb-2"><%= @resume.filename %></h1>
-    <p class="text-sm text-gray-500">
+    <h1 class="text-3xl font-bold mb-2 text-white"><%= @resume.filename %></h1>
+    <p class="text-sm text-gray-400">
       Uploaded <%= time_ago_in_words(@resume.created_at) %> ago
     </p>
   </div>
   
   <% if @resume.summary.present? %>
-    <div class="mb-8 bg-blue-50 rounded-lg p-4">
-      <h2 class="text-xl font-semibold mb-2">Summary</h2>
-      <p class="text-gray-700"><%= @resume.summary %></p>
+    <div class="mb-8 bg-blue-900/30 rounded-lg p-4 border border-blue-700">
+      <h2 class="text-xl font-semibold mb-2 text-blue-300">Summary</h2>
+      <p class="text-gray-300"><%= @resume.summary %></p>
     </div>
   <% end %>
   
   <div class="mb-8">
-    <h2 class="text-2xl font-semibold mb-4">Extracted Skills</h2>
+    <h2 class="text-2xl font-semibold mb-4 text-white">Extracted Skills</h2>
     
     <% if @resume.extracted_skills.any? %>
       <div class="flex flex-wrap gap-2">
@@ -28,20 +28,94 @@
           </span>
         <% end %>
       </div>
+    <% elsif @resume.processing_status == 'failed' %>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
+        <p class="text-red-700 font-medium">
+          ❌ Failed to extract skills
+        </p>
+        <p class="text-sm text-red-600">
+          <%= @resume.processing_error || 'Unknown error occurred' %>
+        </p>
+        <div class="text-sm text-gray-600">
+          <p><strong>Possible reasons:</strong></p>
+          <ul class="list-disc list-inside mt-1">
+            <li>Python service is not responding</li>
+            <li>Resume file format is not supported</li>
+            <li>Network connectivity issue</li>
+          </ul>
+        </div>
+        <button onclick="location.href='<%= resume_path(@resume) %>?retry=true'" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+          Retry Extraction
+        </button>
+      </div>
+    <% elsif @resume.processing_status == 'processing' %>
+      <div class="space-y-3">
+        <p class="text-blue-700 font-medium">
+          ⚙️ Processing resume...
+        </p>
+        
+        <!-- Animated Progress Bar -->
+        <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400 rounded-full animate-progress"></div>
+        </div>
+        
+        <div class="text-sm text-gray-600 space-y-1">
+          <p>✓ Resume uploaded successfully</p>
+          <p>⚙️ Sending to AI service for analysis...</p>
+          <p class="text-gray-400">⏳ Extracting technical & soft skills...</p>
+        </div>
+        
+        <button onclick="location.reload()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+          Check Progress
+        </button>
+      </div>
+      
+      <style>
+        @keyframes progress {
+          0% { width: 20%; }
+          50% { width: 70%; }
+          100% { width: 90%; }
+        }
+        
+        .animate-progress {
+          animation: progress 2s ease-in-out infinite;
+        }
+      </style>
+      
+      <script>
+        setTimeout(() => location.reload(), 3000);
+      </script>
     <% else %>
-      <p class="text-gray-500">
-        Skills are being extracted... This may take a moment.
-      </p>
-      <button onclick="location.reload()" class="mt-3 text-blue-600 hover:underline">
-        Refresh to see results
-      </button>
+      <div class="space-y-3">
+        <p class="text-gray-700 font-medium">
+          📝 Preparing to extract skills...
+        </p>
+        
+        <!-- Static Progress Bar for Pending -->
+        <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+          <div class="h-full bg-blue-400 rounded-full transition-all duration-500" style="width: 10%"></div>
+        </div>
+        
+        <div class="text-sm text-gray-600 space-y-1">
+          <p>✓ Resume uploaded (uploaded <%= time_ago_in_words(@resume.created_at) %> ago)</p>
+          <p>⏳ Waiting to start processing...</p>
+        </div>
+        
+        <button onclick="location.reload()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+          Refresh Status
+        </button>
+      </div>
+      
+      <script>
+        setTimeout(() => location.reload(), 2000);
+      </script>
     <% end %>
   </div>
   
   <!-- Find Matches -->
-  <div class="mb-8 bg-yellow-50 rounded-lg p-6">
-    <h2 class="text-2xl font-semibold mb-4">Find Job Matches</h2>
-    <p class="text-gray-700 mb-4">
+  <div class="mb-8 bg-gradient-to-br from-yellow-900/30 to-orange-900/30 rounded-lg p-6 border border-yellow-700/50">
+    <h2 class="text-2xl font-semibold mb-4 text-yellow-300">Find Job Matches</h2>
+    <p class="text-gray-300 mb-4">
       Match your resume against available jobs to see how well you fit!
     </p>
     
@@ -49,36 +123,36 @@
       <%= hidden_field_tag 'resume_id', @resume.id %>
       
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Select a Job</label>
-        <%= select_tag 'job_id', options_from_collection_for_select(Job.active.recent, 'id', 'title'), { include_blank: 'Choose a job...' }, class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Select a Job</label>
+        <%= select_tag 'job_id', options_from_collection_for_select(Job.active.recent, 'id', 'title', include_blank: 'Choose a job...'), class: "w-full px-3 py-2 bg-gray-700 border border-gray-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       </div>
       
-      <%= submit_tag "Create Match", class: "bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 cursor-pointer" %>
+      <%= submit_tag "Create Match", class: "bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-500 cursor-pointer transition shadow-lg" %>
     <% end %>
   </div>
   
   <!-- Existing Matches -->
   <% if @matches.any? %>
     <div class="mb-8">
-      <h2 class="text-2xl font-semibold mb-4">Your Matches</h2>
+      <h2 class="text-2xl font-semibold mb-4 text-white">Your Matches</h2>
       
       <div class="space-y-4">
         <% @matches.each do |match| %>
           <%= link_to match_path(match), class: "block" do %>
-            <div class="border rounded-lg p-4 hover:shadow-lg transition">
+            <div class="border border-gray-700 rounded-lg p-4 bg-gray-900/50 hover:bg-gray-900 hover:shadow-xl transition">
               <div class="flex justify-between items-center">
                 <div class="flex-1">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                  <h3 class="text-lg font-semibold text-gray-100 mb-1">
                     <%= match.job.title %>
                   </h3>
-                  <p class="text-gray-600 mb-2"><%= match.job.company %></p>
+                  <p class="text-gray-400 mb-2"><%= match.job.company %></p>
                   
                   <div class="flex items-center space-x-4 text-sm">
-                    <span class="text-green-600">
+                    <span class="text-green-400">
                       ✓ <%= match.matched_skills.size %> matched skills
                     </span>
                     <% if match.missing_skills.any? %>
-                      <span class="text-yellow-600">
+                      <span class="text-yellow-400">
                         ⚠ <%= match.missing_skills.size %> missing skills
                       </span>
                     <% end %>
@@ -86,10 +160,10 @@
                 </div>
                 
                 <div class="text-right ml-4">
-                  <p class="text-4xl font-bold text-<%= match.score >= 70 ? 'green' : match.score >= 50 ? 'yellow' : 'red' %>-600">
+                  <p class="text-4xl font-bold text-<%= match.score >= 70 ? 'green' : match.score >= 50 ? 'yellow' : 'red' %>-400">
                     <%= match.match_percentage %>
                   </p>
-                  <p class="text-sm text-gray-600"><%= match.match_level %></p>
+                  <p class="text-sm text-gray-400"><%= match.match_level %></p>
                 </div>
               </div>
             </div>
@@ -100,6 +174,6 @@
   <% end %>
   
   <div class="flex space-x-3">
-    <%= link_to "Delete Resume", resume_path(@resume), method: :delete, data: { confirm: "Are you sure?" }, class: "bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" %>
+    <%= link_to "Delete Resume", resume_path(@resume), method: :delete, data: { confirm: "Are you sure?" }, class: "bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition shadow-lg" %>
   </div>
 </div>

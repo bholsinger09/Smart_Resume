@@ -1,16 +1,16 @@
-<nav class="bg-blue-600 text-white shadow-lg">
+<nav class="bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-xl border-b border-gray-700">
   <div class="container mx-auto px-4">
     <div class="flex justify-between items-center py-4">
       <div class="flex items-center space-x-4">
-        <%= link_to root_path, class: "text-2xl font-bold" do %>
+        <%= link_to root_path, class: "text-2xl font-bold hover:text-blue-400 transition" do %>
           🎯 SmartResume
         <% end %>
       </div>
       
       <div class="flex space-x-6">
-        <%= link_to "Jobs", jobs_path, class: "hover:text-blue-200" %>
-        <%= link_to "Resumes", resumes_path, class: "hover:text-blue-200" %>
-        <%= link_to "Matches", matches_path, class: "hover:text-blue-200" %>
+        <%= link_to "Jobs", jobs_path, class: "hover:text-blue-400 transition" %>
+        <%= link_to "Resumes", resumes_path, class: "hover:text-blue-400 transition" %>
+        <%= link_to "Matches", matches_path, class: "hover:text-blue-400 transition" %>
       </div>
     </div>
   </div>

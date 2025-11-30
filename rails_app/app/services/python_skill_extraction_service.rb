@@ -4,7 +4,7 @@ require 'tempfile'
 class PythonSkillExtractionService
   include HTTParty
   
-  base_uri ENV.fetch('PYTHON_SERVICE_URL', 'http://localhost:8000')
+  base_uri ENV.fetch('PYTHON_SERVICE_URL', 'http://python_service:8000')
   
   def initialize
     @options = {
@@ -31,7 +31,10 @@ class PythonSkillExtractionService
     temp_file = Tempfile.new(['resume', File.extname(file_attachment.filename.to_s)])
     begin
       temp_file.binmode
-      temp_file.write(file_attachment.download)
+      
+      # Download the file with a timeout
+      file_data = file_attachment.download
+      temp_file.write(file_data)
       temp_file.rewind
       
       response = self.class.post(

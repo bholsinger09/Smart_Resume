@@ -2,7 +2,7 @@ class JobsController < ApplicationController
   before_action :set_job, only: [:show, :edit, :update, :destroy, :match_resume]
   
   def index
-    @jobs = Job.active.recent.page(params[:page])
+    @jobs = Job.active.recent.limit(50)
   end
   
   def show

@@ -2,7 +2,7 @@ class ResumesController < ApplicationController
   before_action :set_resume, only: [:show, :destroy, :analysis]
   
   def index
-    @resumes = Resume.order(created_at: :desc).page(params[:page])
+    @resumes = Resume.order(created_at: :desc).limit(50)
   end
   
   def show

@@ -2,7 +2,7 @@ class MatchesController < ApplicationController
   before_action :set_match, only: [:show]
   
   def index
-    @matches = Match.includes(:job, :resume).by_score.page(params[:page])
+    @matches = Match.includes(:job, :resume).by_score.limit(50)
   end
   
   def show

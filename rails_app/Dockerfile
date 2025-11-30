@@ -6,6 +6,7 @@ WORKDIR /app
 RUN apt-get update -qq && apt-get install -y \
     build-essential \
     libpq-dev \
+    postgresql-client \
     nodejs \
     npm \
     curl \
@@ -21,9 +22,17 @@ RUN bundle install
 # Copy the application
 COPY . .
 
+# Make bin files executable
+RUN chmod +x bin/*
+
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/docker-entrypoint.sh
+
 # Precompile assets (if needed)
 # RUN bundle exec rails assets:precompile
 
 EXPOSE 3000
 
-CMD ["rails", "server", "-b", "0.0.0.0"]
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["bin/rails", "server", "-b", "0.0.0.0"]

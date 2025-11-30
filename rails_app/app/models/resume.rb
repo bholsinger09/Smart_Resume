@@ -7,10 +7,20 @@ class Resume < ApplicationRecord
   
   validates :filename, presence: true
   
-  after_create :extract_skills_async
+  after_commit :extract_skills_async, on: :create
+  
+  # Status can be: pending, processing, completed, failed
   
   def extract_skills_from_python_service
-    return unless file.attached?
+    unless file.attached?
+      update(
+        processing_status: 'failed',
+        processing_error: 'No file attached to resume'
+      )
+      return false
+    end
+    
+    update(processing_status: 'processing')
     
     service = PythonSkillExtractionService.new
     result = service.extract_from_file(file)
@@ -19,7 +29,8 @@ class Resume < ApplicationRecord
       update(
         extracted_skills: result[:skills],
         entities: result[:entities],
-        summary: result[:summary]
+        summary: result[:summary],
+        processing_status: 'completed'
       )
       
       # Create skill associations
@@ -30,6 +41,10 @@ class Resume < ApplicationRecord
       
       true
     else
+      update(
+        processing_status: 'failed',
+        processing_error: result[:error]
+      )
       errors.add(:base, "Failed to extract skills: #{result[:error]}")
       false
     end
@@ -43,6 +58,20 @@ class Resume < ApplicationRecord
   
   def extract_skills_async
     # In a real application, this would be a background job
-    extract_skills_from_python_service if file.attached?
+    return unless file.attached?
+    
+    begin
+      extract_skills_from_python_service
+    rescue ActiveStorage::FileNotFoundError => e
+      update(
+        processing_status: 'failed',
+        processing_error: "File not found: #{e.message}"
+      )
+    rescue StandardError => e
+      update(
+        processing_status: 'failed',
+        processing_error: "Error processing resume: #{e.message}"
+      )
+    end
   end
 end

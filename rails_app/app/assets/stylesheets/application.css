@@ -1,0 +1,84 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ */
+
+/* Dark mode base styles */
+body {
+  background-color: #111827 !important;
+  color: #f3f4f6 !important;
+  min-height: 100vh;
+}
+
+/* Override any white backgrounds */
+.bg-white,
+div[class*="bg-white"] {
+  background-color: #1f2937 !important;
+}
+
+/* Fix specific text colors */
+.text-gray-900 {
+  color: #ffffff !important;
+}
+
+.text-gray-800 {
+  color: #f3f4f6 !important;
+}
+
+.text-gray-600 {
+  color: #d1d5db !important;
+}
+
+.text-gray-500 {
+  color: #9ca3af !important;
+}
+
+.text-gray-700 {
+  color: #e5e7eb !important;
+}
+
+/* Ensure all containers have dark backgrounds */
+main {
+  background-color: #111827 !important;
+  width: 100%;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  justify-content: center;
+  padding-top: 2rem;
+}
+
+/* Center content nicely */
+.container {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+/* Better spacing for cards */
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+/* Center text in hero sections */
+.text-center {
+  text-align: center;
+}
+
+/* Better card centering */
+.rounded-lg {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+/* Ensure content stays centered */
+.mx-auto {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
