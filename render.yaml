@@ -44,4 +44,4 @@ services:
         fromService:
           name: smartresume-python
           type: web
-          property: host
+          property: hostport
